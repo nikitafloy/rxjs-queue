@@ -39,6 +39,13 @@ const enter = async (key, taskId, priority = 255) => {
 const quit = (key, taskId) => {
   keys[key] = keys[key].filter((item) => item.id !== taskId);
 
+  // Очередь пуста, тогда удаляем ее
+  // Эвенты рассылать некому
+  if (!keys[key].length) {
+    delete keys[key];
+    return;
+  }
+
   subject$.next(key);
 };
 
@@ -82,6 +89,10 @@ const getPromiseByName = (key, name, args) => {
   switch (name) {
     case "fetchNumber":
       return fetchNumber(...args);
+    // case "throwError":
+    //   throw new Error("Some error");
+    default:
+      throw new Error("Function in key with this name is not exists");
   }
 };
 
@@ -104,12 +115,12 @@ try {
       { number: 1, executionTime: 300 },
       255
     ),
-    resolvePromise(
-      "get number",
-      "fetchNumber",
-      { number: 2, executionTime: 1000 },
-      255
-    ),
+    // resolvePromise(
+    //   "get number",
+    //   "throwError",
+    //   { number: 2, executionTime: 1000 },
+    //   255
+    // ),
     resolvePromise(
       "get number",
       "fetchNumber",
